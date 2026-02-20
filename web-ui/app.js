@@ -49,7 +49,12 @@ class TodoApp {
     async loadTodos() {
         try {
             const res = await fetch(`${this.apiBase}/todos`);
-            this.todos = await res.json();
+            const data = await res.json();
+            this.todos = data.map(t => ({
+                ...t,
+                createdAt: t.createdAt || t.created_at,
+                updatedAt: t.updatedAt || t.updated_at
+            }));
             this.render();
             this.updateStats();
         } catch (err) {
@@ -303,7 +308,9 @@ class TodoApp {
     }
 
     formatDate(dateString) {
+        if (!dateString) return '未知';
         const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '未知';
         return date.toLocaleDateString('zh-CN', {
             month: 'short',
             day: 'numeric',
