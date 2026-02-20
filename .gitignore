@@ -19,6 +19,7 @@ build/
 
 # 依赖
 node_modules/
+/application/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -61,5 +62,5 @@ temp/
 .dynamodb/
 
 # 数据库
-/data/
+/application/data/
 *.db
