@@ -59,3 +59,7 @@ temp/
 .serverless/
 .fusebox/
 .dynamodb/
+
+# 数据库
+/data/
+*.db

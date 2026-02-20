@@ -1,8 +1,9 @@
-// Todo List App - JavaScript 逻辑
+// Todo List App - JavaScript 逻辑（SQLite 后端）
 class TodoApp {
     constructor() {
-        this.todos = JSON.parse(localStorage.getItem('todos')) || [];
+        this.todos = [];
         this.currentFilter = 'all';
+        this.apiBase = '/todo/api';
         
         // DOM 元素
         this.newTodoInput = document.getElementById('newTodo');
@@ -21,11 +22,10 @@ class TodoApp {
         this.init();
     }
 
-    init() {
+    async init() {
         this.setupEventListeners();
         this.updateDate();
-        this.render();
-        this.updateStats();
+        await this.loadTodos();
     }
 
     setupEventListeners() {
@@ -46,61 +46,90 @@ class TodoApp {
         this.deselectAllButton.addEventListener('click', () => this.deselectAll());
     }
 
-    addTodo() {
+    async loadTodos() {
+        try {
+            const res = await fetch(`${this.apiBase}/todos`);
+            this.todos = await res.json();
+            this.render();
+            this.updateStats();
+        } catch (err) {
+            console.error('加载任务失败', err);
+        }
+    }
+
+    async addTodo() {
         const content = this.newTodoInput.value.trim();
         if (!content) return;
 
-        const todo = {
-            id: Date.now(),
-            content,
-            completed: false,
-            createdAt: new Date().toISOString()
-        };
+        try {
+            const res = await fetch(`${this.apiBase}/todos`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content })
+            });
+            const todo = await res.json();
+            this.todos.unshift(todo);
+            this.render();
+            this.updateStats();
 
-        this.todos.push(todo);
-        this.saveToLocalStorage();
-        this.render();
-        this.updateStats();
+            // 清空输入框并聚焦
+            this.newTodoInput.value = '';
+            this.newTodoInput.focus();
 
-        // 清空输入框并聚焦
-        this.newTodoInput.value = '';
-        this.newTodoInput.focus();
-
-        // 添加动画效果
-        this.addButton.classList.add('pulse');
-        setTimeout(() => this.addButton.classList.remove('pulse'), 500);
+            // 添加动画效果
+            this.addButton.classList.add('pulse');
+            setTimeout(() => this.addButton.classList.remove('pulse'), 500);
+        } catch (err) {
+            console.error('添加任务失败', err);
+        }
     }
 
-    toggleTodo(id) {
-        this.todos = this.todos.map(todo => {
-            if (todo.id === id) {
-                return { ...todo, completed: !todo.completed };
-            }
-            return todo;
-        });
+    async toggleTodo(id) {
+        const target = this.todos.find(t => t.id === id);
+        if (!target) return;
+        const newCompleted = !target.completed;
 
-        this.saveToLocalStorage();
-        this.render();
-        this.updateStats();
+        try {
+            const res = await fetch(`${this.apiBase}/todos/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ completed: newCompleted })
+            });
+            const updated = await res.json();
+            this.todos = this.todos.map(todo => (todo.id === id ? updated : todo));
+            this.render();
+            this.updateStats();
+        } catch (err) {
+            console.error('更新任务失败', err);
+        }
     }
 
-    editTodo(id, newContent) {
-        this.todos = this.todos.map(todo => {
-            if (todo.id === id && newContent.trim()) {
-                return { ...todo, content: newContent.trim() };
-            }
-            return todo;
-        });
+    async editTodo(id, newContent) {
+        if (!newContent.trim()) return;
 
-        this.saveToLocalStorage();
-        this.render();
+        try {
+            const res = await fetch(`${this.apiBase}/todos/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: newContent.trim() })
+            });
+            const updated = await res.json();
+            this.todos = this.todos.map(todo => (todo.id === id ? updated : todo));
+            this.render();
+        } catch (err) {
+            console.error('编辑任务失败', err);
+        }
     }
 
-    deleteTodo(id) {
-        this.todos = this.todos.filter(todo => todo.id !== id);
-        this.saveToLocalStorage();
-        this.render();
-        this.updateStats();
+    async deleteTodo(id) {
+        try {
+            await fetch(`${this.apiBase}/todos/${id}`, { method: 'DELETE' });
+            this.todos = this.todos.filter(todo => todo.id !== id);
+            this.render();
+            this.updateStats();
+        } catch (err) {
+            console.error('删除任务失败', err);
+        }
     }
 
     setFilter(event) {
@@ -119,31 +148,45 @@ class TodoApp {
         this.render();
     }
 
-    clearCompleted() {
-        this.todos = this.todos.filter(todo => !todo.completed);
-        this.saveToLocalStorage();
-        this.render();
-        this.updateStats();
+    async clearCompleted() {
+        try {
+            await fetch(`${this.apiBase}/todos/clear-completed`, { method: 'POST' });
+            this.todos = this.todos.filter(todo => !todo.completed);
+            this.render();
+            this.updateStats();
+        } catch (err) {
+            console.error('清除已完成任务失败', err);
+        }
     }
 
-    selectAll() {
-        this.todos = this.todos.map(todo => ({
-            ...todo,
-            completed: true
-        }));
-        this.saveToLocalStorage();
-        this.render();
-        this.updateStats();
+    async selectAll() {
+        try {
+            await fetch(`${this.apiBase}/todos/set-all`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ completed: true })
+            });
+            this.todos = this.todos.map(todo => ({ ...todo, completed: true }));
+            this.render();
+            this.updateStats();
+        } catch (err) {
+            console.error('全选失败', err);
+        }
     }
 
-    deselectAll() {
-        this.todos = this.todos.map(todo => ({
-            ...todo,
-            completed: false
-        }));
-        this.saveToLocalStorage();
-        this.render();
-        this.updateStats();
+    async deselectAll() {
+        try {
+            await fetch(`${this.apiBase}/todos/set-all`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ completed: false })
+            });
+            this.todos = this.todos.map(todo => ({ ...todo, completed: false }));
+            this.render();
+            this.updateStats();
+        } catch (err) {
+            console.error('取消全选失败', err);
+        }
     }
 
     getFilteredTodos() {
@@ -274,41 +317,10 @@ class TodoApp {
         div.textContent = text;
         return div.innerHTML;
     }
-
-    saveToLocalStorage() {
-        localStorage.setItem('todos', JSON.stringify(this.todos));
-    }
 }
 
 // 创建应用实例
 const todoApp = new TodoApp();
-
-// 添加一些初始数据（如果没有数据）
-if (todoApp.todos.length === 0) {
-    todoApp.todos = [
-        {
-            id: 1,
-            content: '学习 Three.js 3D 渲染',
-            completed: true,
-            createdAt: new Date(Date.now() - 86400000).toISOString()
-        },
-        {
-            id: 2,
-            content: '开发 Todo List 应用',
-            completed: true,
-            createdAt: new Date(Date.now() - 43200000).toISOString()
-        },
-        {
-            id: 3,
-            content: '将项目推送到 GitHub',
-            completed: false,
-            createdAt: new Date().toISOString()
-        }
-    ];
-    todoApp.saveToLocalStorage();
-    todoApp.render();
-    todoApp.updateStats();
-}
 
 // 键盘快捷键
 document.addEventListener('keydown', (e) => {
