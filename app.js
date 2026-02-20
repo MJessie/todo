@@ -23,6 +23,7 @@ class TodoApp {
 
     init() {
         this.setupEventListeners();
+        this.updateDate();
         this.render();
         this.updateStats();
     }
@@ -42,7 +43,7 @@ class TodoApp {
         // 操作按钮
         this.clearCompletedButton.addEventListener('click', () => this.clearCompleted());
         this.selectAllButton.addEventListener('click', () => this.selectAll());
-        this.deselectAllButton.addEventListener('click', () => this.deselectAll();
+        this.deselectAllButton.addEventListener('click', () => this.deselectAll());
     }
 
     addTodo() {
@@ -222,6 +223,19 @@ class TodoApp {
             this.editTodo(id, newContent);
         }
         this.render();
+    }
+
+    updateDate() {
+        const dateElement = document.getElementById('todayDate');
+        if (!dateElement) return;
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('zh-CN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'long'
+        });
+        dateElement.textContent = `今天：${dateStr}`;
     }
 
     updateStats() {

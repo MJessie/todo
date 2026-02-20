@@ -310,11 +310,6 @@ body {
     margin: 5px 0;
 }
 
-.deployed-info {
-    font-size: 0.9rem;
-    color: var(--primary-color);
-    font-weight: 600;
-}
 
 /* 响应式设计 */
 @media (max-width: 768px) {

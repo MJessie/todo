@@ -13,23 +13,11 @@
         <header class="header">
             <h1><i class="fas fa-tasks"></i> Todo List</h1>
             <p class="subtitle">简单高效的任务管理器</p>
+            <p class="subtitle" id="todayDate">今天：--</p>
         </header>
 
         <div class="main-content">
-            <div class="input-section">
-                <div class="input-group">
-                    <input type="text" id="newTodo" placeholder="输入新任务..." maxlength="100">
-                    <button id="addBtn" class="btn-primary">
-                        <i class="fas fa-plus"></i> 添加
-                    </button>
-                </div>
-                <div class="filter-section">
-                    <button class="filter-btn active" data-filter="all">全部</button>
-                    <button class="filter-btn" data-filter="active">进行中</button>
-                    <button class="filter-btn" data-filter="completed">已完成</button>
-                </div>
-            </div>
-
+            <!-- 状态统计放在最顶部 -->
             <div class="stats-section">
                 <div class="stat-card">
                     <i class="fas fa-list"></i>
@@ -54,10 +42,27 @@
                 </div>
             </div>
 
+            <!-- 输入部分 -->
+            <div class="input-section">
+                <div class="input-group">
+                    <input type="text" id="newTodo" placeholder="输入新任务..." maxlength="100">
+                    <button id="addBtn" class="btn-primary">
+                        <i class="fas fa-plus"></i> 添加
+                    </button>
+                </div>
+                <div class="filter-section">
+                    <button class="filter-btn active" data-filter="all">全部</button>
+                    <button class="filter-btn" data-filter="active">进行中</button>
+                    <button class="filter-btn" data-filter="completed">已完成</button>
+                </div>
+            </div>
+
+            <!-- 任务列表 -->
             <div class="todo-list" id="todoList">
                 <!-- Todo items will be added here -->
             </div>
 
+            <!-- 操作按钮 -->
             <div class="actions-section">
                 <button id="clearCompleted" class="btn-secondary">
                     <i class="fas fa-trash"></i> 清除已完成
@@ -73,7 +78,6 @@
 
         <footer class="footer">
             <p>© 2026 Todo List App | 本地存储 | 响应式设计</p>
-            <p class="deployed-info">部署于: 118.196.46.184</p>
         </footer>
     </div>
 
