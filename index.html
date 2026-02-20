@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 Todo List App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-tasks"></i> Todo List</h1>
+            <p class="subtitle">简单高效的任务管理器</p>
+        </header>
+
+        <div class="main-content">
+            <div class="input-section">
+                <div class="input-group">
+                    <input type="text" id="newTodo" placeholder="输入新任务..." maxlength="100">
+                    <button id="addBtn" class="btn-primary">
+                        <i class="fas fa-plus"></i> 添加
+                    </button>
+                </div>
+                <div class="filter-section">
+                    <button class="filter-btn active" data-filter="all">全部</button>
+                    <button class="filter-btn" data-filter="active">进行中</button>
+                    <button class="filter-btn" data-filter="completed">已完成</button>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <div class="stat-card">
+                    <i class="fas fa-list"></i>
+                    <div class="stat-info">
+                        <span class="stat-value" id="totalTasks">0</span>
+                        <span class="stat-label">总任务</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-hourglass-half"></i>
+                    <div class="stat-info">
+                        <span class="stat-value" id="activeTasks">0</span>
+                        <span class="stat-label">进行中</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="stat-info">
+                        <span class="stat-value" id="completedTasks">0</span>
+                        <span class="stat-label">已完成</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="todo-list" id="todoList">
+                <!-- Todo items will be added here -->
+            </div>
+
+            <div class="actions-section">
+                <button id="clearCompleted" class="btn-secondary">
+                    <i class="fas fa-trash"></i> 清除已完成
+                </button>
+                <button id="selectAll" class="btn-secondary">
+                    <i class="fas fa-check-double"></i> 全选
+                </button>
+                <button id="deselectAll" class="btn-secondary">
+                    <i class="fas fa-times-circle"></i> 取消全选
+                </button>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>© 2026 Todo List App | 本地存储 | 响应式设计</p>
+            <p class="deployed-info">部署于: 118.196.46.184</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
